@@ -94,18 +94,8 @@ const styles = StyleSheet.create({
   userIconWrapper: {
     position: "absolute",
     top: "45%", // Centra la imagen en el medio de la portada
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#ccc",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
+    width: 82,
+    height: 80
   },
   userIcon: {
     width: 50,
