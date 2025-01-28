@@ -19,8 +19,8 @@ export default function Login({ navigation }) {
       .then((userCredential) => {
         const user = userCredential.user;
         Alert.alert("Inicio de sesión exitoso", `Bienvenido, ${user.email}`);
-        // Navega a la pantalla de Menu
-        navigation.navigate("Menu");
+        // Navega a la pantalla de Hub
+        navigation.navigate("Hub");
       })
       .catch((error) => {
         console.error("Error al iniciar sesión:", error);
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f8d1c4",
+    backgroundColor: "#FAFAFA",
   },
   title: {
     fontSize: 24,
