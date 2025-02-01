@@ -38,10 +38,10 @@ export default function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Iniciar Sesión</Text>
+      <Text style={styles.title}>Iniciar Sesiónnn</Text>
       <TextInput
         style={styles.input}
-        placeholder="Correo electrónico"
+        placeholder="Correo electrónicoo"
         keyboardType="email-address"
         autoCapitalize="none"
         value={email}
