@@ -6,10 +6,13 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { Ionicons } from "@expo/vector-icons";
 import { auth } from "../firebase";
 
 export default function Menu() {
   const [userName, setUserName] = useState("");
+  const [userImage, setUserImage] = useState(require("../assets/usuario.png"));
 
   useEffect(() => {
     const fetchUserName = () => {
@@ -22,45 +25,61 @@ export default function Menu() {
     fetchUserName();
   }, []);
 
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert("Se requiere permiso para acceder a la galería");
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+    if (!result.canceled) {
+      setUserImage({ uri: result.assets[0].uri });
+    }
+  };
+
+  const takePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      alert("Se requiere permiso para usar la cámara");
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+    if (!result.canceled) {
+      setUserImage({ uri: result.assets[0].uri });
+    }
+  };
+
   return (
     <View style={styles.container}>
-      {/* Título arriba */}
       <Text style={styles.title}>Bienvenido a tu Diario</Text>
 
-      {/* Contenedor de portada y usuario */}
       <View style={styles.coverContainer}>
-        <Image
-          source={require("../assets/portada.png")}
-          style={styles.coverImage}
-        />
-        {/* Imagen del usuario */}
+        <Image source={require("../assets/portada.png")} style={styles.coverImage} />
         <View style={styles.userIconWrapper}>
-          <Image
-            source={require("../assets/usuario.png")}
-            style={styles.userIcon}
-          />
+          <Image source={userImage} style={styles.userIcon} />
         </View>
+        <TouchableOpacity style={styles.cameraButton} onPress={pickImage} onLongPress={takePhoto}>
+          <Ionicons name="camera" size={24} color="#fff" />
+        </TouchableOpacity>
       </View>
 
-      {/* Texto de saludo */}
-      <Text style={styles.greeting}>
-        Hola {userName.toUpperCase()}, cuéntame sobre tu día
-      </Text>
+      <Text style={styles.greeting}>Hola {userName.toUpperCase()}, cuéntame sobre tu día</Text>
 
-      {/* Botón de micrófono */}
       <TouchableOpacity style={styles.micButton}>
-        <Image
-          source={require("../assets/microfono.png")}
-          style={styles.micIcon}
-        />
+        <Image source={require("../assets/microfono.png")} style={styles.micIcon} />
       </TouchableOpacity>
 
-      {/* Botón de escribir */}
       <TouchableOpacity style={styles.writeButton}>
-        <Image
-          source={require("../assets/texto.png")}
-          style={styles.writeIcon}
-        />
+        <Image source={require("../assets/texto.png")} style={styles.writeIcon} />
       </TouchableOpacity>
     </View>
   );
@@ -93,24 +112,35 @@ const styles = StyleSheet.create({
   },
   userIconWrapper: {
     position: "absolute",
-    top: "45%", // Centra la imagen en el medio de la portada
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    top: "45%",
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: "#ccc",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
+    overflow: "hidden",
   },
   userIcon: {
-    width: 50,
-    height: 50,
-    tintColor: "#000",
+    width: "100%",
+    height: "100%",
+    borderRadius: 50,
+  },
+  cameraButton: {
+    position: "absolute",
+    bottom: 10,
+    right: 140,
+    backgroundColor: "#000",
+    padding: 4,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
   },
   greeting: {
     fontSize: 18,
