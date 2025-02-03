@@ -35,7 +35,7 @@ export default StyleSheet.create({
       justifyContent: "center",
       alignItems: "center",
       borderWidth: 3,
-      borderColor: "#D5A6A6",
+      borderColor: "#FF8C42",
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.2,
