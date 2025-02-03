@@ -8,46 +8,60 @@ import {
   Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { FontAwesome } from "@expo/vector-icons";
 
 export default function HistorialNotas() {
-  const [viewMode, setViewMode] = useState("list"); // 'list' o 'notebook'
   const navigation = useNavigation();
+  const [modoLista, setModoLista] = useState(true);
 
-  // Cambiar entre vista de lista y cuaderno
-  const toggleViewMode = () => {
-    setViewMode(viewMode === "list" ? "notebook" : "list");
+  const notas = [
+    { id: "1", titulo: "Nota 1", descripcion: "Aquí va la descripción de la nota" },
+    { id: "2", titulo: "Nota 2", descripcion: "Aquí va la descripción de la nota" },
+    { id: "3", titulo: "Nota 3", descripcion: "Aquí va la descripción de la nota" },
+  ];
+
+  const toggleModo = () => {
+    setModoLista(!modoLista);
   };
 
   return (
     <View style={styles.container}>
-      {/* Encabezado */}
-      <View style={styles.header}>
-
-        <TouchableOpacity onPress={toggleViewMode}>
-          <Image source={require("../assets/cuaderno.png")} style={styles.toggleIcon} />
-        </TouchableOpacity>
-      </View>
+      {/* Botón de regreso */}
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <FontAwesome name="arrow-left" size={20} color="#000" />
+        <Text style={styles.backText}>Mis notas</Text>
+      </TouchableOpacity>
 
       {/* Título */}
       <Text style={styles.title}>Notas creadas</Text>
 
-      {/* Botón agregar notas */}
-      <View style={styles.addNotesContainer}>
-        <TouchableOpacity style={styles.addNotesButton} onPress={() => navigation.navigate("Menu")}>
-          <Text style={styles.addNotesText}>Agregar Notas</Text>
+      {/* Botón de Cambiar Modo */}
+      <View style={styles.headerContainer}>
+        <FontAwesome name="book" size={20} color="#F2994A" />
+        <TouchableOpacity style={styles.changeModeButton} onPress={toggleModo}>
+          <Text style={styles.buttonText}>Cambiar modo</Text>
         </TouchableOpacity>
-        <View style={styles.line} />
       </View>
-
-      {/* Vista de lista (Vacía por ahora) */}
-      {viewMode === "list" ? (
-        <View style={styles.emptyListContainer}>
-          <Text style={styles.emptyListText}>Aún no hay notas creadas 📝</Text>
-        </View>
+      
+      <View style={styles.separator} />
+      
+      {/* Lista de Notas */}
+      {modoLista ? (
+        <FlatList
+          data={notas}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.noteItem}>
+              <View>
+                <Text style={styles.noteTitle}>{item.titulo}</Text>
+                <Text style={styles.noteDescription}>{item.descripcion}</Text>
+              </View>
+              <Image source={require("../assets/nota_icono.png")} style={styles.noteIcon} />
+            </View>
+          )}
+        />
       ) : (
-        <View style={styles.notebookView}>
-          <Text style={styles.notebookText}>📖 Vista de Cuaderno (En desarrollo)</Text>
-        </View>
+        <Text style={styles.modeText}>Modo cuaderno aún no implementado</Text>
       )}
     </View>
   );
@@ -56,69 +70,73 @@ export default function HistorialNotas() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    backgroundColor: "#FFF",
+    padding: 20,
   },
-  header: {
+  backButton: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 10,
+    marginTop: 60,
   },
   backText: {
-    fontSize: 16,
-    color: "#333",
-  },
-  toggleIcon: {
-    width: 30,
-    height: 30,
+    fontSize: 18,
+    marginLeft: 5,
+    fontWeight: "bold",
+
   },
   title: {
     fontSize: 22,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 10,
-    color: "#333",
   },
-  addNotesContainer: {
+  headerContainer: {
+    flexDirection: "row",
     alignItems: "center",
-    marginBottom: 15,
+    justifyContent: "center",
   },
-  addNotesButton: {
-    backgroundColor: "#FF8C42",
+  changeModeButton: {
+    backgroundColor: "#F2994A",
     paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    marginLeft: 8,
   },
-  addNotesText: {
-    color: "#FFFFFF",
+  buttonText: {
+    color: "#FFF",
     fontWeight: "bold",
   },
-  line: {
-    width: "100%",
+  separator: {
     height: 2,
-    backgroundColor: "#FFA07A",
-    marginTop: 5,
+    backgroundColor: "#F2994A",
+    marginVertical: 10,
   },
-  emptyListContainer: {
-    flex: 1,
+  noteItem: {
+    flexDirection: "row",
+    backgroundColor: "#F6F6F6",
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
   },
-  emptyListText: {
+  noteTitle: {
     fontSize: 16,
-    color: "#888",
-    fontStyle: "italic",
-  },
-  notebookView: {
-    alignItems: "center",
-    justifyContent: "center",
-    flex: 1,
-  },
-  notebookText: {
-    fontSize: 18,
     fontWeight: "bold",
-    color: "#555",
+  },
+  noteDescription: {
+    fontSize: 14,
+    color: "#888",
+  },
+  noteIcon: {
+    width: 40,
+    height: 40,
+  },
+  modeText: {
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 20,
+    fontStyle: "italic",
   },
 });
