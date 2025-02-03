@@ -30,7 +30,7 @@ export default StyleSheet.create({
     justifyContent: "center",
   },
   changeModeButton: {
-    backgroundColor: "#F2994A",
+    backgroundColor: "#FF8C42",
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 10,
@@ -42,7 +42,7 @@ export default StyleSheet.create({
   },
   separator: {
     height: 2,
-    backgroundColor: "#F2994A",
+    backgroundColor: "#FF8C42",
     marginVertical: 10,
   },
   noteItem: {
