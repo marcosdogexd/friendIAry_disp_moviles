@@ -90,22 +90,24 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 15,
-    color: "#5D3A3A",
+    marginBottom: 1, // Bajado un poco
+    marginTop: 45, // Subido un poco
+    color: "#000000",
   },
   coverContainer: {
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
+    marginTop: 20, // Bajado un poco
   },
   coverImage: {
     width: "90%",
-    height: 180,
+    height: 200, // Aumentado un poco para dar más espacio
     resizeMode: "contain",
   },
   userIconWrapper: {
     position: "absolute",
-    bottom: -30, // Posiciona sobre la portada
+    bottom: -40, // Posiciona sobre la portada, más abajo
     width: 80,
     height: 80,
     borderRadius: 40,
@@ -127,8 +129,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: "center",
     color: "#5D3A3A",
-    marginTop: 50,
-    marginBottom: 40,
+    marginTop: 70, // Bajado más
+    marginBottom: 50, // Más espacio con los botones
     fontWeight: "500",
   },
   micButton: {
@@ -143,7 +145,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
-    marginBottom: 20,
+    marginBottom: 30, // Bajado un poco más
   },
   micIcon: {
     width: 55,
@@ -161,6 +163,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
+    marginTop: 10, // Espaciado mejorado
   },
   writeIcon: {
     width: 50,
