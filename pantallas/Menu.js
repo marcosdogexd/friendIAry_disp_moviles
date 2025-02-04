@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -6,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
+
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { auth } from "../firebase";
@@ -13,6 +15,8 @@ import { auth } from "../firebase";
 export default function Menu() {
   const [userName, setUserName] = useState("");
   const [userImage, setUserImage] = useState(require("../assets/usuario.png"));
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchUserName = () => {
@@ -75,13 +79,19 @@ export default function Menu() {
 
         <Text style={styles.greeting}>Hola {userName.toUpperCase()}, cuéntame sobre tu día</Text>
 
-        <TouchableOpacity style={styles.micButton}>
-          <Image source={require("../assets/microfono.png")} style={styles.micIcon} />
-        </TouchableOpacity>
+        <TouchableOpacity
+        style={styles.micButton}
+        onPress={() => navigation.navigate("Recording")}
+      >
+        <Image source={require("../assets/microfono.png")} style={styles.micIcon} />
+      </TouchableOpacity>
 
         <TouchableOpacity style={styles.writeButton}>
           <Image source={require("../assets/texto.png")} style={styles.writeIcon} />
         </TouchableOpacity>
+
+          
+
       </View>
     </View>
   );
