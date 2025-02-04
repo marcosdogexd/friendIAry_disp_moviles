@@ -5,10 +5,11 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
-  StyleSheet,
+  ImageBackground,
 } from "react-native";
-import { auth } from "../firebase"; // Importa la configuración de Firebase
+import { auth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import styles from "../styles/LoginEstilos";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
@@ -19,11 +20,9 @@ export default function Login({ navigation }) {
       .then((userCredential) => {
         const user = userCredential.user;
         Alert.alert("Inicio de sesión exitoso", `Bienvenido, ${user.email}`);
-        // Navega a la pantalla de Menu
-        navigation.navigate("Menu");
+        navigation.navigate("Hub");
       })
       .catch((error) => {
-        console.error("Error al iniciar sesión:", error);
         if (error.code === "auth/user-not-found") {
           Alert.alert("Error", "Usuario no encontrado. Regístrate primero.");
         } else if (error.code === "auth/wrong-password") {
@@ -37,69 +36,41 @@ export default function Login({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Iniciar Sesión</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Correo electrónico"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        value={email}
-        onChangeText={(text) => setEmail(text)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Contraseña"
-        secureTextEntry
-        value={password}
-        onChangeText={(text) => setPassword(text)}
-      />
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Iniciar Sesión</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("Registro")}>
-        <Text style={styles.linkText}>
-          ¿No tienes una cuenta? Regístrate aquí
-        </Text>
-      </TouchableOpacity>
-    </View>
+    <ImageBackground
+      source={require("../assets/background.png")} // 📌 Imagen de fondo
+      style={styles.background}
+    >
+      <View style={styles.overlay}>
+        <Text style={styles.title}>Iniciar Sesión</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Correo electrónico"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
+          placeholderTextColor="#ccc"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Contraseña"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+          placeholderTextColor="#ccc"
+        />
+
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Iniciar Sesión</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => navigation.navigate("Registro")}>
+          <Text style={styles.linkText}>
+            ¿No tienes una cuenta? <Text style={{ color: "#FFD700" }}>Regístrate aquí</Text>
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </ImageBackground>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f8d1c4",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  input: {
-    width: "80%",
-    height: 40,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-  },
-  button: {
-    width: "80%",
-    padding: 15,
-    borderRadius: 5,
-    backgroundColor: "#ff784f",
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  linkText: {
-    marginTop: 15,
-    color: "#007BFF",
-  },
-});
