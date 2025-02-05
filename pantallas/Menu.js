@@ -6,11 +6,14 @@ import {
   TouchableOpacity,
   Animated,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native"; // Importa useNavigation
 import { auth } from "../firebase";
-import  styles  from "../styles/MenuEstilos";
+import styles from "../styles/MenuEstilos";
 
 export default function Menu() {
   const [userName, setUserName] = useState("");
+  const navigation = useNavigation(); // Obtén la navegación aquí
+
   const scaleAnimMic = new Animated.Value(1);
   const scaleAnimWrite = new Animated.Value(1);
 
@@ -66,10 +69,10 @@ export default function Menu() {
         </TouchableOpacity>
       </Animated.View>
 
-      {/* Botón de escribir */}
+      {/* Botón de escribir - Ahora navega correctamente a Mensajes.js */}
       <Animated.View style={[styles.writeButton, { transform: [{ scale: scaleAnimWrite }] }]}>
         <TouchableOpacity
-          onPress={() => console.log("Escribir Nota")}
+          onPress={() => navigation.navigate("Mensajes")} // Aquí navega correctamente
           onPressIn={() => animatePressIn(scaleAnimWrite)}
           onPressOut={() => animatePressOut(scaleAnimWrite)}
         >

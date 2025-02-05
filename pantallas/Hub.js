@@ -101,11 +101,11 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Selecciona cómo te sientes</Text>
+      <Text style={styles.title}>¿Como te sientes el día de hoy?</Text>
 
       {/* Contenedor (emojis) */}
       <View style={styles.moodContainer}>
-        <Text style={styles.moodText}>Estado anímico actual</Text>
+        <Text style={styles.moodText}>Selecciona el emoji que describa tu animo</Text>
         <View style={styles.moodIcons}>
           {Object.keys(moodImages).map((mood) => (
             <TouchableOpacity
