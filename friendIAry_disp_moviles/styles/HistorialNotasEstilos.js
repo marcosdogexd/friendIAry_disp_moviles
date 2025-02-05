@@ -131,4 +131,53 @@ export default StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+
+  analysisButton: {
+    alignSelf: "center", // Centra el botón en la pantalla
+    borderWidth: 2, // Contorno del botón
+    borderColor: "#FF6347", // Color tomate
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginVertical: 15, // Espacio arriba y abajo
+  },
+  
+  analysisButtonText: {
+    color: "#000", // Texto negro
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  stateContainer: {
+    backgroundColor: "#FFDDC1", // Fondo color durazno suave
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 20,
+    borderWidth: 2,
+    borderColor: "#FF6347", // Borde rojo tomate
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  
+  stateTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#D84315", // Naranja oscuro
+    textAlign: "center",
+    marginBottom: 5,
+  },
+  
+  stateText: {
+    fontSize: 16,
+    color: "#5D4037", // Marrón oscuro
+    textAlign: "center",
+    fontStyle: "italic",
+  },
+  
+  
 });

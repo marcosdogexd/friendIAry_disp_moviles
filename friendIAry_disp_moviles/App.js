@@ -6,7 +6,10 @@ import Registro from "./pantallas/Registro";
 import Hub from "./pantallas/Hub"; // Hub maneja el Bottom Tab Navigator
 import Menu from "./pantallas/Menu";
 import HistorialNotas from "./pantallas/HistorialNotas"; // Agregamos HistorialNotas
+import AnalisisSentimientos from "./pantallas/AnalisisSentimientos";
 import Mensajes from "./pantallas/Mensajes"; // Agregamos Mensajes
+
+
 
 const Stack = createStackNavigator();
 
@@ -20,6 +23,7 @@ export default function App() {
         <Stack.Screen name="Menu" component={Menu} />
         <Stack.Screen name="HistorialNotas" component={HistorialNotas} /> 
         <Stack.Screen name="Mensajes" component={Mensajes} />
+        <Stack.Screen name="AnalisisSentimientos" component={AnalisisSentimientos} />
       </Stack.Navigator>
     </NavigationContainer>
   );
