@@ -16,7 +16,6 @@ export default StyleSheet.create({
     fontSize: 18,
     marginLeft: 5,
     fontWeight: "bold",
-
   },
   title: {
     fontSize: 22,
@@ -45,6 +44,8 @@ export default StyleSheet.create({
     backgroundColor: "#FF8C42",
     marginVertical: 10,
   },
+
+  // 📌 Estilo para cada ítem de la lista de notas
   noteItem: {
     flexDirection: "row",
     backgroundColor: "#F6F6F6",
@@ -53,6 +54,9 @@ export default StyleSheet.create({
     marginBottom: 10,
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  noteContentContainer: {
+    flex: 1, // Para evitar que empuje la imagen
   },
   noteTitle: {
     fontSize: 16,
@@ -65,11 +69,66 @@ export default StyleSheet.create({
   noteIcon: {
     width: 40,
     height: 40,
+    alignSelf: "center", // Evita que la imagen se mueva
   },
   modeText: {
     fontSize: 16,
     textAlign: "center",
     marginTop: 20,
     fontStyle: "italic",
+  },
+
+  // 📌 Estilos para el Modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    width: "85%",
+    maxHeight: "75%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 5,
+  },
+  modalDate: {
+    fontSize: 14,
+    color: "#777",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  modalContentContainer: {
+    maxHeight: 250,
+  },
+  modalScrollView: {
+    paddingHorizontal: 5,
+  },
+  modalContent: {
+    fontSize: 16,
+    color: "#333",
+    textAlign: "justify",
+  },
+  closeButton: {
+    marginTop: 10,
+    backgroundColor: "#FF8C42",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
