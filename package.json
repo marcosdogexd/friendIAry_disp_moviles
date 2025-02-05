@@ -9,23 +9,44 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^1.1.9",
+    "@ai-sdk/react": "^1.1.8",
+    "@headlessui/react": "^2.2.0",
+    "@heroicons/react": "^2.2.0",
+    "@react-native-community/cli": "latest",
     "@react-navigation/native": "^7.0.14",
     "@react-navigation/stack": "^7.1.1",
+    "@tailwindcss/vite": "^4.0.3",
+    "ai": "^4.1.17",
+    "autoprefixer": "^10.4.20",
+    "dayjs": "^1.11.13",
     "expo": "~52.0.23",
+    "expo-linear-gradient": "~14.0.2",
     "expo-local-authentication": "~15.0.2",
+    "expo-router": "^4.0.17",
     "expo-status-bar": "~2.0.0",
     "firebase": "^11.2.0",
+    "nativewind": "^4.1.23",
+    "postcss": "^8.5.1",
     "react": "18.3.1",
+    "react-dom": "^18.3.1",
     "react-native": "0.76.5",
+    "react-native-date-picker": "^5.0.10",
+    "react-native-dotenv": "^3.4.11",
     "react-native-gesture-handler": "^2.22.0",
     "react-native-reanimated": "^3.16.7",
-    "react-native-safe-area-context": "^5.1.0",
+    "react-native-safe-area-context": "^5.2.0",
     "react-native-screens": "^4.5.0",
+    "react-native-ui-datepicker": "^2.0.11",
     "react-native-vector-icons": "^10.2.0",
-    "expo-linear-gradient": "~14.0.2"
+    "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "@types/react": "~18.3.12",
+    "metro-react-native-babel-preset": "^0.77.0",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.3.3"
   },
   "private": true
 }

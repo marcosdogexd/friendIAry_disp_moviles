@@ -8,7 +8,9 @@ import {
 } from "react-native";
 import { auth } from "../firebase";
 
-export default function Menu() {
+
+export default function Menu({navigation}) {
+  
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
@@ -56,7 +58,7 @@ export default function Menu() {
       </TouchableOpacity>
 
       {/* Botón de escribir */}
-      <TouchableOpacity style={styles.writeButton}>
+      <TouchableOpacity style={styles.writeButton} onPress={() => navigation.navigate("Diario")}>
         <Image
           source={require("../assets/texto.png")}
           style={styles.writeIcon}

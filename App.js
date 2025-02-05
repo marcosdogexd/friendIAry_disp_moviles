@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Login from "./pantallas/Login";
 import Registro from "./pantallas/Registro";
 import Menu from "./pantallas/Menu";
+import Diario from "./pantallas/Diario";
 
 const Stack = createStackNavigator();
 
@@ -14,6 +15,7 @@ export default function App() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Registro" component={Registro} />
         <Stack.Screen name="Menu" component={Menu} />
+        <Stack.Screen name="Diario" component={Diario} />
       </Stack.Navigator>
     </NavigationContainer>
   );
