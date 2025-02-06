@@ -114,31 +114,18 @@ export default function AnalisisSentimientos() {
         <FontAwesome name="arrow-left" size={20} color="#000" />
         <Text style={styles.backText}>Volver</Text>
       </TouchableOpacity>
-
+  
       <Text style={styles.title}>Análisis de Sentimientos</Text>
-
+  
       {cargando ? (
         <ActivityIndicator size="large" color="#F2994A" />
       ) : (
-        <>
-          {/* Cuadro resaltado del estado anímico */}
-          <View style={styles.stateContainer}>
-            <Text style={styles.stateTitle}>🧠 Estado anímico general</Text>
-            <Text style={styles.stateText}>{estadoGeneral}</Text>
-          </View>
-
-          <FlatList
-            data={notas}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={styles.noteItem}>
-                <Text style={styles.noteTitle}>{item.titulo}</Text>
-                <Text style={styles.sentimiento}>Sentimiento: {analisis[item.id] || "Analizando..."}</Text>
-              </View>
-            )}
-          />
-        </>
+        <View style={styles.stateContainer}>
+          <Text style={styles.stateTitle}>🧠 Estado anímico general</Text>
+          <Text style={styles.stateText}>{estadoGeneral}</Text>
+        </View>
       )}
     </View>
   );
+  
 }
