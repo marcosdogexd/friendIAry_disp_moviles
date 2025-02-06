@@ -76,7 +76,7 @@ export default function HistorialNotas() {
       </View>
 
       <TouchableOpacity style={styles.analysisButton} onPress={() => navigation.navigate("AnalisisSentimientos") }>
-        <Text style={styles.analysisButtonText}>📊 Análisis de Sentimientos</Text>
+        <Text style={styles.analysisButtonText}>📊 Tus Sentimientos a traves del tiempo</Text>
       </TouchableOpacity>
 
       <View style={styles.separator} />
