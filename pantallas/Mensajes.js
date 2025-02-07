@@ -53,6 +53,21 @@ export default function Mensajes() {
       setTitulo("");
       setContenido("");
       navigation.goBack(); // Volver a la pantalla anterior
+
+       // Llamar al backend para analizar la nota
+    const response = await fetch("http://192.168.100.149:3000/analizar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contenido }),
+    });
+
+    const data = await response.json();
+    if (data.analisis) {
+      navigation.navigate("AnalisisSentimiento", { analisis: data.analisis });
+    } else {
+      Alert.alert("Error", "No se pudo analizar el sentimiento.");
+    }
+
     } catch (error) {
       console.error("Error al guardar la nota:", error);
       Alert.alert("Error", "No se pudo guardar la nota.");
