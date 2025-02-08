@@ -58,4 +58,24 @@ export default StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+
+  cardAnalisis: {
+    borderWidth: 2,
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 20,
+    alignItems: "center",
+  },
+  
+  label: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 10,
+  },
+  
+  textoAnalisis: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  
 });
