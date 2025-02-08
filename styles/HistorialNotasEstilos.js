@@ -131,4 +131,20 @@ export default StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+/*estilos para las notas con emojis */
+  emoji: {
+    fontSize: 60,
+    marginRight: 10,
+  },
+  modalEmoji: {
+    fontSize: 50,
+    textAlign: "center",
+    marginVertical: 10,
+  },
+  modalSentiment: {
+    fontSize: 16,
+    textAlign: "center",
+    color: "#333",
+  },
+  
 });
