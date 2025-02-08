@@ -1,18 +1,3 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const axios = require("axios");
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-app.use(cors());
-app.use(bodyParser.json());
-
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-
-// Ruta para analizar sentimientos
 app.post("/analizar", async (req, res) => {
   const { contenido } = req.body;
 
@@ -24,10 +9,35 @@ app.post("/analizar", async (req, res) => {
     const response = await axios.post(
       "https://api.openai.com/v1/chat/completions",
       {
-        model: "gpt-4o-mini",
+        model: "gpt-4o-mini",  // Asegúrate de que el modelo sea correcto
+        response_format: "json", 
         messages: [
-          { role: "system", content: "Analiza el sentimiento de este texto en positivo, negativo o neutro y explica brevemente por qué y tambien ponlo en porcentaje cada sentimiento analizado en el texto." },
-          { role: "user", content: contenido }
+          {
+            role: "system",
+            content: "Eres un asistente que analiza sentimientos en textos. Devuelve solo un JSON sin explicaciones."
+          },
+          {
+            role: "user",
+            content: `Analiza el siguiente texto y devuelve un JSON con el análisis de sentimientos.  
+            Debes detectar las emociones **Ira, Tristeza, Miedo, Alegría, Asco y Sorpresa**, asignarles un porcentaje de intensidad y agregar su emoji correspondiente.  
+
+            Texto: "${contenido}"
+
+            Devuelve el JSON con esta estructura exacta:
+
+            {
+              "sentiment_analysis": {
+                "text": "<Texto analizado>",
+                "emotions": [
+                  {
+                    "name": "<Nombre de la emoción>",
+                    "level": <Porcentaje de intensidad>,
+                    "emoji": "<Emoji correspondiente>"
+                  }
+                ]
+              }
+            }`
+          }
         ]
       },
       {
@@ -35,15 +45,19 @@ app.post("/analizar", async (req, res) => {
       }
     );
 
-    const resultado = response.data.choices[0].message.content;
-    res.json({ analisis: resultado });
+    let resultado = response.data.choices[0].message.content;
+
+    try {
+      // Intentar parsear la respuesta de OpenAI como JSON
+      const analisis = JSON.parse(resultado);
+      res.json({ analisis });
+    } catch (jsonError) {
+      console.error("Error al parsear el JSON de OpenAI:", jsonError);
+      res.status(500).json({ error: "Error al procesar el análisis de sentimiento" });
+    }
 
   } catch (error) {
     console.error("Error al analizar el sentimiento:", error);
     res.status(500).json({ error: "Error al procesar la solicitud" });
   }
-});
-
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://192.168.100.149:${PORT}`);
 });
