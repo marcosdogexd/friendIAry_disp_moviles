@@ -14,18 +14,29 @@ import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import styles from "../styles/HistorialNotasEstilos";
 
+// Diccionario de emojis según el sentimiento
+const EMOJI_SENTIMIENTOS = {
+  Miedo: "😨",
+  Ira: "😡",
+  Tristeza: "😢",
+  Alegría: "😃",
+  Asco: "🤢",
+  Sorpresa: "😲",
+};
+
 export default function HistorialNotas() {
   const navigation = useNavigation();
   const [modoLista, setModoLista] = useState(true);
   const [notas, setNotas] = useState([]);
   const [notaSeleccionada, setNotaSeleccionada] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalNotaVisible, setModalNotaVisible] = useState(false); // Modal para la nota
+  const [modalSentimientoVisible, setModalSentimientoVisible] = useState(false); // Modal para el análisis de sentimientos
+  const [analisisSentimiento, setAnalisisSentimiento] = useState(null); // Estado para mostrar el análisis
 
   useEffect(() => {
     cargarNotas();
   }, []);
 
-  // 🔹 Carga las notas del usuario autenticado desde Firestore
   const cargarNotas = async () => {
     try {
       const auth = getAuth();
@@ -52,7 +63,14 @@ export default function HistorialNotas() {
 
   const abrirNota = (nota) => {
     setNotaSeleccionada(nota);
-    setModalVisible(true);
+    setModalNotaVisible(true);
+    setModalSentimientoVisible(false); // Cerrar modal de sentimiento si está abierto
+  };
+
+  const abrirAnalisisSentimiento = (analisis) => {
+    setAnalisisSentimiento(analisis); // Guardar el análisis seleccionado
+    setModalSentimientoVisible(true);
+    setModalNotaVisible(false); // Cerrar modal de nota si está abierto
   };
 
   return (
@@ -79,26 +97,28 @@ export default function HistorialNotas() {
       {/* 📝 Lista de Notas */}
       {modoLista ? (
         <FlatList
-        data={notas}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => abrirNota(item)}>
-            <View style={styles.noteItem}>
-              <View style={styles.noteContentContainer}>
-                <Text style={styles.noteTitle}>{item.titulo}</Text>
-                <Text
-                  style={styles.noteDescription}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {item.contenido}
-                </Text>
+          data={notas}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => abrirNota(item)}>
+              <View style={styles.noteItem}>
+                <View style={styles.noteContentContainer}>
+                  <Text style={styles.noteTitle}>{item.titulo}</Text>
+                  <Text style={styles.noteDescription} numberOfLines={1} ellipsizeMode="tail">
+                    {item.contenido}
+                  </Text>
+                  {/* Mostrar el análisis de sentimientos como un emoji */}
+                  <TouchableOpacity onPress={() => abrirAnalisisSentimiento(item.analisisSentimiento)}>
+                    <Text style={styles.noteSentiment}>
+                      {item.analisisSentimiento ? "😊" : "No disponible"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <Image source={require("../assets/nota_icono.png")} style={styles.noteIcon} />
               </View>
-              <Image source={require("../assets/nota_icono.png")} style={styles.noteIcon} />
-            </View>
-          </TouchableOpacity>
-        )}
-      />
+            </TouchableOpacity>
+          )}
+        />
       ) : (
         <Text style={styles.modeText}>Modo cuaderno aún no implementado</Text>
       )}
@@ -107,8 +127,8 @@ export default function HistorialNotas() {
       <Modal
         animationType="fade"
         transparent
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+        visible={modalNotaVisible}
+        onRequestClose={() => setModalNotaVisible(false)}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -116,16 +136,36 @@ export default function HistorialNotas() {
             <Text style={styles.modalDate}>
               {new Date(notaSeleccionada?.timestamp?.seconds * 1000).toLocaleString()}
             </Text>
+            <ScrollView style={styles.modalContentContainer}>
+              <Text style={styles.modalContent}>{notaSeleccionada?.contenido}</Text>
+            </ScrollView>
+            <TouchableOpacity style={styles.closeButton} onPress={() => setModalNotaVisible(false)}>
+              <Text style={styles.closeButtonText}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
-            <View style={styles.modalContentContainer}>
-              <ScrollView style={styles.modalScrollView}>
-                <Text style={styles.modalContent}>{notaSeleccionada?.contenido}</Text>
-              </ScrollView>
-            </View>
-
+      {/* 🗂️ Modal para ver el análisis de sentimiento */}
+      <Modal
+        animationType="fade"
+        transparent
+        visible={modalSentimientoVisible}
+        onRequestClose={() => setModalSentimientoVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Análisis de Sentimiento</Text>
+            {/* Muestra el emoji y la explicación del sentimiento */}
+            <Text style={styles.modalEmoji}>
+              {EMOJI_SENTIMIENTOS[analisisSentimiento?.emocion_principal] || "😶"}
+            </Text>
+            <Text style={styles.modalSentiment}>
+              {analisisSentimiento?.explicacion || "No hay análisis disponible."}
+            </Text>
             <TouchableOpacity
               style={styles.closeButton}
-              onPress={() => setModalVisible(false)}
+              onPress={() => setModalSentimientoVisible(false)}
             >
               <Text style={styles.closeButtonText}>Cerrar</Text>
             </TouchableOpacity>
@@ -135,3 +175,4 @@ export default function HistorialNotas() {
     </View>
   );
 }
+
