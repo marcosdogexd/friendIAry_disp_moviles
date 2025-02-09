@@ -27,7 +27,7 @@ export default function Mensajes() {
       Alert.alert("Error", "No puedes guardar una nota vacía.");
       return;
     }
-
+  
     setCargando(true);
     const auth = getAuth();
     const user = auth.currentUser;
@@ -36,49 +36,65 @@ export default function Mensajes() {
       Alert.alert("Error", "No se encontró usuario autenticado.");
       return;
     }
-
+  
     const fechaActual = format(new Date(), "yyyy-MM-dd_HH:mm");
     const tituloNota = titulo.trim() ? titulo : `Nota_${fechaActual}`;
-
+  
     try {
-      // 🔹 Llamar al backend para analizar el sentimiento
+      console.log("📡 Enviando solicitud al backend...");
+      
+      // 🔹 Fetch con timeout de 10 segundos
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+  
       const response = await fetch("http://192.168.100.149:3000/analizar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ contenido }),
+        signal: controller.signal, // Conectar el abort controller
       });
-
+  
+      clearTimeout(timeout); // Limpiar timeout si responde antes
+  
+      if (!response.ok) {
+        throw new Error(`Error en el servidor: ${response.status}`);
+      }
+  
       const data = await response.json();
+      console.log("📥 Respuesta recibida:", data);
+  
       if (!data.analisis) {
         throw new Error("No se recibió análisis de sentimientos.");
       }
-
-      // 🔹 Guardar la nota en Firebase con el análisis de sentimiento
+  
+      // 🔹 Guardar en Firebase
       const userDocRef = doc(db, "notas", user.displayName);
       const notaRef = doc(collection(userDocRef, "mis_notas"), fechaActual);
-
+  
       await setDoc(notaRef, {
         usuario: user.displayName,
         titulo: tituloNota,
         contenido,
         timestamp: new Date(),
-        analisisSentimiento: data.analisis, // Guardar análisis de sentimiento
+        analisisSentimiento: data.analisis,
       });
-
+  
+      console.log("✅ Nota guardada en Firebase");
       Alert.alert("Éxito", "Tu nota ha sido guardada.");
+  
       setTitulo("");
       setContenido("");
       setCargando(false);
-
-      // 🔹 Navegar a la pantalla de análisis con los resultados
-      navigation.navigate("AnalisisSentimiento", { analisis: data.analisis });
+  
+      // 🔹 Navegar a la pantalla de análisis
+      //navigation.navigate("AnalisisSentimiento", { analisis: data.analisis });
     } catch (error) {
-      console.error("Error al guardar la nota:", error);
+      console.error("❌ Error al guardar la nota:", error);
       Alert.alert("Error", error.message || "No se pudo guardar la nota.");
       setCargando(false);
     }
   };
-
+  
   return (
     <View style={styles.container}>
       {/* 🔙 Botón de volver */}
