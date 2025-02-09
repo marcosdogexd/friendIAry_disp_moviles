@@ -14,10 +14,13 @@ import { FontAwesome } from "@expo/vector-icons";
 import { format, differenceInMinutes, addMinutes } from "date-fns"; 
 import * as LocalAuthentication from "expo-local-authentication"; 
 import styles from "../styles/HubEstilos";
+// importar la libreria FONTAWESON
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 // Importar pantallas
 import Menu from "./Menu";
 import HistorialNotas from "./HistorialNotas";
+import Comunidad from "./Comunidad";
 
 const db = getFirestore();
 const Tab = createBottomTabNavigator();
@@ -217,6 +220,17 @@ export default function Hub() {
           ),
         }}
       />
+      <Tab.Screen 
+        name= "Comunidad"
+        component={Comunidad}
+        options={{
+          tabBarIcon:({color,size})=> (
+            <FontAwesome name="users" size={size} color={color} />
+          )
+        }}
+
+      />
     </Tab.Navigator>
   );
 }
+
