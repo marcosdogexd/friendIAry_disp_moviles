@@ -8,6 +8,7 @@ import Menu from "./pantallas/Menu";
 import HistorialNotas from "./pantallas/HistorialNotas"; // Agregamos HistorialNotas
 import Mensajes from "./pantallas/Mensajes"; // Agregamos Mensajes
 import AnalisisSentimiento from "./pantallas/AnalisisSentimiento";
+import Comunidad from "./pantallas/Comunidad";
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
         <Stack.Screen name="HistorialNotas" component={HistorialNotas} /> 
         <Stack.Screen name="Mensajes" component={Mensajes} />
         <Stack.Screen name="AnalisisSentimiento" component={AnalisisSentimiento} />
+        <Stack.Screen name="Comunidad" component={Comunidad}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
