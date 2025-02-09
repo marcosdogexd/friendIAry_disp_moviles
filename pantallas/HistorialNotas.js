@@ -7,6 +7,7 @@ import {
   Image,
   Modal,
   ScrollView,
+  Button,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { FontAwesome } from "@expo/vector-icons";
@@ -14,15 +15,6 @@ import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import styles from "../styles/HistorialNotasEstilos";
 
-// Diccionario de emojis según el sentimiento
-const EMOJI_SENTIMIENTOS = {
-  Miedo: "😨",
-  Ira: "😡",
-  Tristeza: "😢",
-  Alegría: "😃",
-  Asco: "🤢",
-  Sorpresa: "😲",
-};
 
 export default function HistorialNotas() {
   const navigation = useNavigation();
@@ -107,16 +99,19 @@ export default function HistorialNotas() {
                   <Text style={styles.noteDescription} numberOfLines={1} ellipsizeMode="tail">
                     {item.contenido}
                   </Text>
-                  {/* Mostrar el análisis de sentimientos como un emoji */}
-                  <TouchableOpacity onPress={() => abrirAnalisisSentimiento(item.analisisSentimiento)}>
-                    <Text style={styles.noteSentiment}>
-                      {item.analisisSentimiento ? "😊" : "No disponible"}
-                    </Text>
-                  </TouchableOpacity>
                 </View>
                 <Image source={require("../assets/nota_icono.png")} style={styles.noteIcon} />
+                
+                  {/* Mostrar el análisis de sentimientos como un emoji */}
+                <TouchableOpacity  onPress={() => abrirAnalisisSentimiento(item.analisisSentimiento)}>
+                    <View>
+                    <Image source={require("../assets/semafemoji.png")}style={styles.noteIcon}/>
+                    </View>
+                  </TouchableOpacity>
+                
               </View>
             </TouchableOpacity>
+            
           )}
         />
       ) : (
@@ -148,31 +143,42 @@ export default function HistorialNotas() {
 
       {/* 🗂️ Modal para ver el análisis de sentimiento */}
       <Modal
-        animationType="fade"
-        transparent
-        visible={modalSentimientoVisible}
-        onRequestClose={() => setModalSentimientoVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Análisis de Sentimiento</Text>
-            {/* Muestra el emoji y la explicación del sentimiento */}
-            <Text style={styles.modalEmoji}>
-              {EMOJI_SENTIMIENTOS[analisisSentimiento?.emocion_principal] || "😶"}
+      animationType="fade"
+      transparent
+      visible={modalSentimientoVisible}
+      onRequestClose={() => setModalSentimientoVisible(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalTitle}>Análisis de Sentimiento</Text>
+          <ScrollView>
+            {/* Mostrar el texto analizado */}
+            <Text style={styles.modalText}>
+              Texto Analizado: {analisisSentimiento?.sentiment_analysis?.text || "No hay texto disponible."}
             </Text>
-            <Text style={styles.modalSentiment}>
-              {analisisSentimiento?.explicacion || "No hay análisis disponible."}
-            </Text>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setModalSentimientoVisible(false)}
-            >
-              <Text style={styles.closeButtonText}>Cerrar</Text>
-            </TouchableOpacity>
-          </View>
+
+            {/* Iterar sobre todas las emociones */}
+            {analisisSentimiento?.sentiment_analysis?.emotions.map((emotion, index) => (
+              <View key={index} style={styles.emotionContainer}>
+                <Text style={styles.modalEmoji}>{emotion.emoji}</Text>
+                <Text style={styles.modalSentiment}>{emotion.name}</Text>
+                <Text style={styles.modalIntensity}>
+                  Nivel de Intensidad: {(emotion.level ).toFixed(0)}%
+                </Text>
+              </View>
+            ))}
+          </ScrollView>
+
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setModalSentimientoVisible(false)}
+          >
+            <Text style={styles.closeButtonText}>Cerrar</Text>
+          </TouchableOpacity>
         </View>
-      </Modal>
+      </View>
+    </Modal>
+
     </View>
   );
 }
-
