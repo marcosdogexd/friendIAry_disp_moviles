@@ -6,9 +6,11 @@ import Registro from "./pantallas/Registro";
 import Hub from "./pantallas/Hub"; // Hub maneja el Bottom Tab Navigator
 import Menu from "./pantallas/Menu";
 import HistorialNotas from "./pantallas/HistorialNotas"; // Agregamos HistorialNotas
-import AnalisisSentimientos from "./pantallas/AnalisisSentimientos";
+import AnalisisSentimientos from "./pantallas/analisisSentimientos";
 import Mensajes from "./pantallas/Mensajes"; // Agregamos Mensajes
-
+console.log("Navigation Container initialized");
+console.log("Stack Navigator initialized");
+console.log("Screens initialized: Login, Registro, Hub, Menu, HistorialNotas, Mensajes, AnalisisSentimientos");
 
 
 const Stack = createStackNavigator();
