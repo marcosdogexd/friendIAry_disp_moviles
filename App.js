@@ -9,6 +9,7 @@ import HistorialNotas from "./pantallas/HistorialNotas"; // Agregamos HistorialN
 import Mensajes from "./pantallas/Mensajes"; // Agregamos Mensajes
 import AnalisisSentimiento from "./pantallas/AnalisisSentimiento";
 import Comunidad from "./pantallas/Comunidad";
+import MensajeAudio from "./pantallas/MensajesAudio" ;   // pantala de ingresar las notas mediante voz
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -23,6 +24,7 @@ export default function App() {
         <Stack.Screen name="Mensajes" component={Mensajes} />
         <Stack.Screen name="AnalisisSentimiento" component={AnalisisSentimiento} />
         <Stack.Screen name="Comunidad" component={Comunidad}/>
+        <Stack.Screen name="MensajesAudio" component={MensajeAudio}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
