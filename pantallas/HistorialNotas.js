@@ -30,7 +30,6 @@ const moodImages = {
 
 export default function HistorialNotas() { 
   const navigation = useNavigation(); 
-  const [modoLista, setModoLista] = useState(true);
   const [notas, setNotas] = useState([]);
   const [notaSeleccionada, setNotaSeleccionada] = useState(null);
   const [modalNotaVisible, setModalNotaVisible] = useState(false);
@@ -53,7 +52,7 @@ export default function HistorialNotas() {
       const db = getFirestore();
       const notasRef = collection(db, "notas", user.displayName, "mis_notas");
 
-      // Suscripción a cambios en tiempo real
+      // Suscripción en tiempo real
       const unsubscribe = onSnapshot(notasRef, async (querySnapshot) => {
         const notasCargadas = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -84,44 +83,14 @@ export default function HistorialNotas() {
     }
   };
 
-  const toggleModo = () => {
-    setModoLista(!modoLista);
-  };
-
   const abrirNota = (nota) => {
     setNotaSeleccionada(nota);
     setModalNotaVisible(true);
   };
 
-  // Muestra el mensaje empático y actualiza el estado en tiempo real
-  const mostrarMensajeSentimiento = async (nota) => {
-    if (nota.mensajeEmpatico) {
-      setMensajeModal(nota.mensajeEmpatico);
-      setModalMensajeVisible(true);
-      return;
-    }
-
-    setCargandoMensaje(true);
-    setModalMensajeVisible(true);
-
-    try {
-      const mensaje = await generarYGuardarMensajeEmpatico(
-        nota.id,
-        nota.contenido,
-        nota.sentimiento
-      );
-
-      // Actualizar el estado local de las notas
-      setNotas((prevNotas) =>
-        prevNotas.map((n) => (n.id === nota.id ? { ...n, mensajeEmpatico: mensaje } : n))
-      );
-
-      setMensajeModal(mensaje);
-    } catch (error) {
-      setMensajeModal("No pude generar un mensaje en este momento. 😔");
-    } finally {
-      setCargandoMensaje(false);
-    }
+  // Navegar a la pantalla de estadísticas
+  const irAEstadisticas = () => {
+    navigation.navigate("Estadisticas");
   };
 
   return (
@@ -138,47 +107,41 @@ export default function HistorialNotas() {
       {/* Título */}
       <Text style={styles.title}>Notas creadas</Text>
 
-      {/* Botón de Cambiar Modo */}
+      {/* Botón "Tu Análisis" en lugar de "Cambiar Modo" */}
       <View style={styles.headerContainer}>
-        <FontAwesome name="book" size={20} color="#F2994A" />
-        <TouchableOpacity style={styles.changeModeButton} onPress={toggleModo}>
-          <Text style={styles.buttonText}>Cambiar modo</Text>
+        <FontAwesome name="line-chart" size={20} color="#F2994A" />
+        <TouchableOpacity style={styles.analisisButton} onPress={irAEstadisticas}>
+          <Text style={styles.buttonText}>Tu análisis</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.separator} />
 
       {/* Lista de Notas */}
-      {modoLista ? (
-        <FlatList
-          data={notas}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.noteItem}>
-              {/* Contenedor de la nota */}
-              <TouchableOpacity
-                onPress={() => abrirNota(item)}
-                style={styles.noteContentContainer}
-              >
-                <Text style={styles.noteTitle}>{item.titulo}</Text>
-                <Text style={styles.noteDescription} numberOfLines={1} ellipsizeMode="tail">
-                  {item.contenido}
-                </Text>
-              </TouchableOpacity>
-              
-              {/* Emoji del estado de ánimo */}
-              <TouchableOpacity onPress={() => mostrarMensajeSentimiento(item)}>
-                <Image
-                  source={moodImages[item.sentimiento] || moodImages.neutral}
-                  style={styles.noteIcon} 
-                />
-              </TouchableOpacity>
-            </View>
-          )}
-        />
-      ) : (
-        <Text style={styles.modeText}>Modo cuaderno aún no implementado</Text>
-      )}
+      <FlatList
+        data={notas}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.noteItem}>
+            {/* Contenedor de la nota */}
+            <TouchableOpacity
+              onPress={() => abrirNota(item)}
+              style={styles.noteContentContainer}
+            >
+              <Text style={styles.noteTitle}>{item.titulo}</Text>
+              <Text style={styles.noteDescription} numberOfLines={1} ellipsizeMode="tail">
+                {item.contenido}
+              </Text>
+            </TouchableOpacity>
+            
+            {/* Emoji del estado de ánimo */}
+            <Image
+              source={moodImages[item.sentimiento] || moodImages.neutral}
+              style={styles.noteIcon} 
+            />
+          </View>
+        )}
+      />
 
       {/* Modal para ver nota completa */}
       <Modal
@@ -201,30 +164,6 @@ export default function HistorialNotas() {
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setModalNotaVisible(false)}
-            >
-              <Text style={styles.closeButtonText}>Cerrar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Modal para ver el mensaje de ánimo */}
-      <Modal
-        animationType="fade"
-        transparent
-        visible={modalMensajeVisible}
-        onRequestClose={() => setModalMensajeVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.splashModal}>
-            {cargandoMensaje ? (
-              <ActivityIndicator size="large" color="#FF8C42" />
-            ) : (
-              <Text style={styles.splashMessage}>{mensajeModal}</Text>
-            )}
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setModalMensajeVisible(false)}
             >
               <Text style={styles.closeButtonText}>Cerrar</Text>
             </TouchableOpacity>

@@ -45,7 +45,7 @@ export default StyleSheet.create({
     marginVertical: 10,
   },
 
-  // 📌 Estilo para cada ítem de la lista de notas
+  // Estilo para cada ítem de la lista de notas
   noteItem: {
     flexDirection: "row",
     backgroundColor: "#F6F6F6",
@@ -67,9 +67,11 @@ export default StyleSheet.create({
     color: "#888",
   },
   noteIcon: {
-    width: 40,
-    height: 40,
-    alignSelf: "center", // Evita que la imagen se mueva
+    width: 40,  // Ajuste del tamaño del emoji
+    height: 40, // Para mantenerlo cuadrado
+    fontSize: 30, // Tamaño del emoji
+    textAlign: "center", // Asegura que el emoji esté alineado
+    alignSelf: "center", // Mantiene la alineación vertical correcta
   },
   modeText: {
     fontSize: 16,
@@ -78,7 +80,7 @@ export default StyleSheet.create({
     fontStyle: "italic",
   },
 
-  // 📌 Estilos para el Modal
+  // Estilos para el Modal
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
@@ -131,4 +133,27 @@ export default StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+  splashModal: {
+    backgroundColor: "#FFF",
+    padding: 20,
+    borderRadius: 15,
+    width: "80%",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  splashMessage: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 10,
+    color: "#333",
+  },
+    analisisButton: {
+      backgroundColor: "#FF8C42",
+      paddingVertical: 8,
+      paddingHorizontal: 15},
+      
 });
