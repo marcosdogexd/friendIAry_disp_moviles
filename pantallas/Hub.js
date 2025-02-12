@@ -9,10 +9,10 @@ import {
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"; 
 import { useNavigation } from "@react-navigation/native"; 
 import { getAuth } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore"; 
-import { FontAwesome } from "@expo/vector-icons"; 
-import { format, differenceInMinutes, addMinutes } from "date-fns"; 
-import * as LocalAuthentication from "expo-local-authentication"; 
+import { getFirestore, collection, doc, addDoc, getDocs, serverTimestamp } from "firebase/firestore";
+import { FontAwesome } from "@expo/vector-icons";
+import { format, differenceInMinutes } from "date-fns";
+import * as LocalAuthentication from "expo-local-authentication";
 import styles from "../styles/HubEstilos";
 
 // Importar pantallas
@@ -39,9 +39,23 @@ const HomeScreen = () => {
 
   useEffect(() => {
     checkExistingMood();
+
+    // Intervalo para reducir el contador cada minuto
+    const interval = setInterval(() => {
+      setTimeRemaining((prevTime) => {
+        if (prevTime > 1) {
+          return prevTime - 1;
+        } else {
+          setSelectedMood(null); // Restablece el estado cuando el tiempo llega a 0
+          return 0;
+        }
+      });
+    }, 60000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  // Verifica si ya eligió un estado de ánimo en los últimos 30 minutos
+  // Verifica si ya eligió un estado de ánimo en los últimos 2 minutos
   const checkExistingMood = async () => { 
     try {
       const auth = getAuth();
@@ -50,17 +64,31 @@ const HomeScreen = () => {
 
       const userName = user.displayName || "Usuario";
       const today = format(new Date(), "yyyy-MM-dd");
-      const docId = `${userName}_${today}`;
 
-      const docRef = doc(db, "estados_animo", docId);
-      const docSnap = await getDoc(docRef);
+      // Referencia a la subcolección del usuario
+      const moodsCollectionRef = collection(db, "estados_animo", userName, "estados");
+      const querySnapshot = await getDocs(moodsCollectionRef);
 
-      if (docSnap.exists()) {
-        const lastUpdate = docSnap.data().timestamp.toDate();
-        const minutesPassed = differenceInMinutes(new Date(), lastUpdate);
+      let lastMood = null;
+      let lastTimestamp = null;
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const docDate = format(data.timestamp.toDate(), "yyyy-MM-dd");
+
+        if (docDate === today) {
+          if (!lastTimestamp || data.timestamp.toDate() > lastTimestamp) {
+            lastTimestamp = data.timestamp.toDate();
+            lastMood = data.estado;
+          }
+        }
+      });
+
+      if (lastMood && lastTimestamp) {
+        const minutesPassed = differenceInMinutes(new Date(), lastTimestamp);
 
         if (minutesPassed < 30) {
-          setSelectedMood(docSnap.data().estado);
+          setSelectedMood(lastMood);
           setTimeRemaining(30 - minutesPassed);
         } else {
           setSelectedMood(null);
@@ -72,7 +100,7 @@ const HomeScreen = () => {
     }
   };
 
-  // Guarda el estado de ánimo, establece un nuevo límite de 30 minutos
+  // Guarda el estado de ánimo en la subcolección del usuario
   const saveMoodToFirestore = async (mood) => {
     try {
       const auth = getAuth();
@@ -80,16 +108,13 @@ const HomeScreen = () => {
       if (!user) return;
 
       const userName = user.displayName || "Usuario";
-      const today = format(new Date(), "yyyy-MM-dd");
-      const docId = `${userName}_${today}`;
 
-      const userMoodRef = doc(db, "estados_animo", docId);
-      const timestamp = new Date();
+      // Referencia a la subcolección "estados" dentro del usuario
+      const moodsCollectionRef = collection(db, "estados_animo", userName, "estados");
 
-      await setDoc(userMoodRef, {
-        usuario: userName,
+      await addDoc(moodsCollectionRef, {
         estado: mood,
-        timestamp: timestamp,
+        timestamp: serverTimestamp(),
       });
 
       setSelectedMood(mood);
@@ -101,23 +126,23 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>¿Como te sientes el día de hoy?</Text>
+      <Text style={styles.title}>¿Cómo te sientes el día de hoy?</Text>
 
       {/* Contenedor (emojis) */}
       <View style={styles.moodContainer}>
-        <Text style={styles.moodText}>Selecciona el emoji que describa tu animo</Text>
+        <Text style={styles.moodText}>Selecciona el emoji que describa tu ánimo</Text>
         <View style={styles.moodIcons}>
           {Object.keys(moodImages).map((mood) => (
             <TouchableOpacity
               key={mood}
               onPress={() => saveMoodToFirestore(mood)}
-              disabled={selectedMood !== null} // Bloquea si ya eligió un estado
+              disabled={selectedMood !== null}
             >
               <Image
                 source={moodImages[mood]}
                 style={[
                   styles.moodIcon,
-                  selectedMood === mood ? styles.selectedMood : {}, // Estilo si está seleccionado
+                  selectedMood === mood ? styles.selectedMood : {},
                 ]}
               />
             </TouchableOpacity>
@@ -153,7 +178,7 @@ const handleBiometricAuth = async (navigation) => {
 
   const isEnrolled = await LocalAuthentication.isEnrolledAsync();
   if (!isEnrolled) {
-    Alert.alert("Error", "No hay huellas registradas en este dispositivo.");
+    Alert.alert("Error", "No hay huellas registradas en el dispositivo.");
     return;
   }
 
@@ -169,12 +194,13 @@ const handleBiometricAuth = async (navigation) => {
   }
 };
 
-//Bottom Tab Navigator=Inicio, Crear Notas, Lista de Notas
+// Bottom Tab Navigator
 export default function Hub() {
   const navigation = useNavigation();
 
   return (
     <Tab.Navigator
+      initialRouteName="Crear Notas"
       screenOptions={{
         headerShown: false,
         tabBarStyle: styles.tabBar,
@@ -183,11 +209,11 @@ export default function Hub() {
       }}
     >
       <Tab.Screen
-        name="Inicio"
+        name="Estado de Ánimo"
         component={HomeScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="home" size={size} color={color} />
+            <FontAwesome name="angellist" size={size} color={color} />
           ),
         }}
       />
@@ -217,6 +243,6 @@ export default function Hub() {
           ),
         }}
       />
-    </Tab.Navigator>
+    </Tab.Navigator> 
   );
 }
