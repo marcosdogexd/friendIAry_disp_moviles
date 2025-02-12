@@ -28,7 +28,7 @@ export default StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  changeModeButton: {
+  statsButton: {
     backgroundColor: "#FF8C42",
     paddingVertical: 8,
     paddingHorizontal: 15,

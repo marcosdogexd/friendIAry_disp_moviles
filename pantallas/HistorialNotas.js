@@ -52,7 +52,7 @@ export default function HistorialNotas() {
       const db = getFirestore();
       const notasRef = collection(db, "notas", user.displayName, "mis_notas");
 
-      // Suscripción en tiempo real
+      // Suscripción a cambios en tiempo real
       const unsubscribe = onSnapshot(notasRef, async (querySnapshot) => {
         const notasCargadas = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -88,9 +88,35 @@ export default function HistorialNotas() {
     setModalNotaVisible(true);
   };
 
-  // Navegar a la pantalla de estadísticas
-  const irAEstadisticas = () => {
-    navigation.navigate("Estadisticas");
+  // Muestra el mensaje empático y actualiza el estado en tiempo real
+  const mostrarMensajeSentimiento = async (nota) => {
+    if (nota.mensajeEmpatico) {
+      setMensajeModal(nota.mensajeEmpatico);
+      setModalMensajeVisible(true);
+      return;
+    }
+
+    setCargandoMensaje(true);
+    setModalMensajeVisible(true);
+
+    try {
+      const mensaje = await generarYGuardarMensajeEmpatico(
+        nota.id,
+        nota.contenido,
+        nota.sentimiento
+      );
+
+      // Actualizar el estado local de las notas
+      setNotas((prevNotas) =>
+        prevNotas.map((n) => (n.id === nota.id ? { ...n, mensajeEmpatico: mensaje } : n))
+      );
+
+      setMensajeModal(mensaje);
+    } catch (error) {
+      setMensajeModal("No pude generar un mensaje en este momento. 😔");
+    } finally {
+      setCargandoMensaje(false);
+    }
   };
 
   return (
@@ -107,11 +133,11 @@ export default function HistorialNotas() {
       {/* Título */}
       <Text style={styles.title}>Notas creadas</Text>
 
-      {/* Botón "Tu Análisis" en lugar de "Cambiar Modo" */}
+      {/* Botón "Estadísticas" */}
       <View style={styles.headerContainer}>
-        <FontAwesome name="line-chart" size={20} color="#F2994A" />
-        <TouchableOpacity style={styles.analisisButton} onPress={irAEstadisticas}>
-          <Text style={styles.buttonText}>Tu análisis</Text>
+        <FontAwesome name="bar-chart" size={20} color="#F2994A" />
+        <TouchableOpacity style={styles.statsButton} onPress={() => navigation.navigate("Estadisticas")}>
+          <Text style={styles.buttonText}>Estadísticas</Text>
         </TouchableOpacity>
       </View>
 
@@ -135,10 +161,12 @@ export default function HistorialNotas() {
             </TouchableOpacity>
             
             {/* Emoji del estado de ánimo */}
-            <Image
-              source={moodImages[item.sentimiento] || moodImages.neutral}
-              style={styles.noteIcon} 
-            />
+            <TouchableOpacity onPress={() => mostrarMensajeSentimiento(item)}>
+              <Image
+                source={moodImages[item.sentimiento] || moodImages.neutral}
+                style={styles.noteIcon} 
+              />
+            </TouchableOpacity>
           </View>
         )}
       />
@@ -164,6 +192,30 @@ export default function HistorialNotas() {
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setModalNotaVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal para ver el mensaje de ánimo */}
+      <Modal
+        animationType="fade"
+        transparent
+        visible={modalMensajeVisible}
+        onRequestClose={() => setModalMensajeVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.splashModal}>
+            {cargandoMensaje ? (
+              <ActivityIndicator size="large" color="#FF8C42" />
+            ) : (
+              <Text style={styles.splashMessage}>{mensajeModal}</Text>
+            )}
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalMensajeVisible(false)}
             >
               <Text style={styles.closeButtonText}>Cerrar</Text>
             </TouchableOpacity>
