@@ -37,7 +37,7 @@ export default function Login({ navigation }) {
 
   return (
     <ImageBackground
-      source={require("../assets/background.png")} // 📌 Imagen de fondo
+      source={require("../assets/background.png")} //  Imagen de fondo
       style={styles.background}
     >
       <View style={styles.overlay}>
