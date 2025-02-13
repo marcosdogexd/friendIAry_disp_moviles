@@ -1,7 +1,8 @@
 # FriendIAry
 
 FriendIAry es una aplicación móvil desarrollada en React Native con Expo, diseñada para ayudar a los usuarios a registrar y gestionar sus pensamientos y emociones a través de notas escritas y grabaciones de audio. La aplicación incorpora inteligencia artificial para analizar el sentimiento de las notas y proporcionar respuestas empáticas basadas en su contenido.
-
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow?style=for-the-badge&logo=javascript)
+![React Native](https://img.shields.io/badge/React%20Native-0.72-blue?style=for-the-badge&logo=react)
 ## Características Principales
 
 - **Creación de Notas:** Permite a los usuarios escribir notas con un título opcional y guardarlas en Firebase.
