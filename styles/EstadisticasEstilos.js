@@ -14,6 +14,16 @@ export default StyleSheet.create({
     marginBottom: 10,
     marginTop: 50,
   },
+  switchButtonText: {
+    backgroundColor: "#FF8C42",
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    marginLeft: 8,
+    color: "#FFF",
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
   backText: {
     fontSize: 18,
     marginLeft: 5,

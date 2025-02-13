@@ -6,7 +6,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import { getFirestore, collection, doc, getDoc, setDoc, getDocs } from "firebase/firestore";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { FontAwesome } from "@expo/vector-icons";
 import { BarChart } from "react-native-chart-kit";
@@ -26,40 +26,11 @@ export default function Estadisticas({ navigation }) {
   const [resumenGPT, setResumenGPT] = useState("");
   const [analisisEstados, setAnalisisEstados] = useState({});
   const [loading, setLoading] = useState(true);
-  const [modoSemanal, setModoSemanal] = useState(true);
+  const [modoSemanal, setModoSemanal] = useState(true); // Estado para alternar entre semanal y diario
 
   useEffect(() => {
-    cargarDatosGuardados();
+    cargarNotas();
   }, [modoSemanal]);
-
-  const cargarDatosGuardados = async () => {
-    try {
-      const auth = getAuth();
-      const user = auth.currentUser;
-      if (!user) return;
-
-      const db = getFirestore();
-      const estadisticasRef = doc(db, "estadisticas", user.displayName);
-      const estadisticasSnap = await getDoc(estadisticasRef);
-
-      if (estadisticasSnap.exists()) {
-        const datos = estadisticasSnap.data();
-        if (modoSemanal && datos.general) {
-          setResumenGPT(datos.general.resumen);
-          setAnalisisEstados(datos.general.analisis);
-        } else if (!modoSemanal && datos.diario) {
-          setResumenGPT(datos.diario.resumen);
-          setAnalisisEstados(datos.diario.analisis);
-        }
-        setLoading(false);
-      } else {
-        cargarNotas();
-      }
-    } catch (error) {
-      console.error("Error al cargar datos guardados:", error);
-      cargarNotas();
-    }
-  };
 
   const cargarNotas = async () => {
     try {
@@ -73,45 +44,21 @@ export default function Estadisticas({ navigation }) {
 
       let notasCargadas = querySnapshot.docs.map((doc) => doc.data());
 
+      // Filtrar notas si está en modo diario
       if (!modoSemanal) {
-        const hoy = new Date().toISOString().split("T")[0]; 
+        const hoy = new Date().toISOString().split("T")[0]; // Fecha de hoy en formato YYYY-MM-DD
         notasCargadas = notasCargadas.filter((nota) =>
           nota.timestamp?.toDate().toISOString().startsWith(hoy)
         );
       }
 
       setNotas(notasCargadas);
-      await generarResumenConGPT(notasCargadas);
-      await generarAnalisisPorEstado(notasCargadas);
+      generarResumenConGPT(notasCargadas);
+      generarAnalisisPorEstado(notasCargadas);
       setLoading(false);
     } catch (error) {
       console.error("Error al cargar notas:", error);
       setLoading(false);
-    }
-  };
-
-  const guardarEnFirestore = async (tipo, resumen, analisis) => {
-    try {
-      const auth = getAuth();
-      const user = auth.currentUser;
-      if (!user) return;
-
-      const db = getFirestore();
-      const estadisticasRef = doc(db, "estadisticas", user.displayName);
-
-      await setDoc(
-        estadisticasRef,
-        {
-          [tipo]: {
-            resumen,
-            analisis,
-            timestamp: new Date(),
-          },
-        },
-        { merge: true }
-      );
-    } catch (error) {
-      console.error("Error al guardar estadísticas en Firestore:", error);
     }
   };
 
@@ -136,7 +83,8 @@ export default function Estadisticas({ navigation }) {
               } basadas en notas escritas y estados de ánimo expresados con emojis. 
               Genera un resumen claro y conciso (máximo 1 párrafo) de cómo fue ${
                 modoSemanal ? "la semana" : "el día"
-              } del usuario en términos de emociones, mencionando patrones relevantes sin repetición innecesaria.`,
+              } del usuario en términos de emociones, mencionando patrones relevantes sin repetición innecesaria. 
+              Evita frases predefinidas como 'Resumen semanal'. El resumen debe estar bien estructurado dentro de un contenedor y fácil de leer.`,
             },
             { role: "user", content: `Aquí están mis notas:\n${textoNotas}` },
           ],
@@ -150,10 +98,54 @@ export default function Estadisticas({ navigation }) {
         }
       );
       setResumenGPT(response.data.choices[0].message.content);
-      await guardarEnFirestore(modoSemanal ? "general" : "diario", response.data.choices[0].message.content, analisisEstados);
     } catch (error) {
       console.error("Error al generar resumen con GPT:", error);
       setResumenGPT("No se pudo generar el resumen en este momento.");
+    }
+  };
+
+  const generarAnalisisPorEstado = async (notas) => {
+    try {
+      const estados = Object.keys(moodIcons);
+      let analisis = {};
+
+      for (const estado of estados) {
+        const notasEstado = notas
+          .filter((nota) => nota.sentimiento === estado)
+          .map((nota) => nota.contenido)
+          .join("\n");
+
+        if (notasEstado) {
+          const response = await axios.post(
+            "https://api.openai.com/v1/chat/completions",
+            {
+              model: "gpt-3.5-turbo",
+              messages: [
+                {
+                  role: "system",
+                  content: `Eres un diario emocional que analiza las razones detrás de diferentes estados de ánimo del usuario. 
+                  Para cada estado de ánimo si esque ha experimentado ese, proporciona una breve descripción personal (máximo 15 palabras) de factores o eventos que llevaron a ese estado.`,
+                },
+                {
+                  role: "user",
+                  content: `Aquí están mis notas con el estado de ánimo ${estado}:\n${notasEstado}`,
+                },
+              ],
+              max_tokens: 50,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          analisis[estado] = response.data.choices[0].message.content;
+        }
+      }
+      setAnalisisEstados(analisis);
+    } catch (error) {
+      console.error("Error al generar análisis de estados con GPT:", error);
     }
   };
 
@@ -166,6 +158,7 @@ export default function Estadisticas({ navigation }) {
 
       <Text style={styles.title}>Tu Análisis {modoSemanal ? "Semanal" : "Diario"}</Text>
 
+      {/* Botón para alternar entre análisis semanal y diario */}
       <TouchableOpacity
         style={styles.switchButton}
         onPress={() => {
@@ -188,26 +181,31 @@ export default function Estadisticas({ navigation }) {
 
           <Text style={styles.chartTitle}>Distribución de estados de ánimo</Text>
           <BarChart
-            data={{
+             data={{
               labels: Object.keys(moodIcons).map((estado) => moodIcons[estado]),
               datasets: [
-                {
-                  data: Object.keys(moodIcons).map(
-                    (estado) =>
-                      notas.filter((nota) => nota.sentimiento === estado).length
-                  ),
-                },
+            {
+              data: Object.keys(moodIcons).map(
+              (estado) => notas.filter((nota) => nota.sentimiento === estado).length
+               ),
+              },
               ],
-            }}
-            width={320}
-            height={200}
-            chartConfig={{
-              backgroundGradientFrom: "#fff",
-              backgroundGradientTo: "#fff",
-              color: () => "#FF8C42",
-            }}
-          />
-
+         }} 
+         width={280}
+         height={190}
+         chartConfig={{
+           backgroundGradientFrom: "#fff",
+           backgroundGradientTo: "#fff",
+           color: () => "#985224",
+           decimalPlaces: 0, // Solo mostrar números enteros
+           propsForVerticalLabels: { fontSize: 20 },
+           propsForHorizontalLabels: { fontSize: 14 }, 
+         }}
+         yAxisLabel="" 
+         yAxisSuffix="" 
+         showBarTops={true} // Ocultar los números en la parte superior de las barras
+         fromZero={true}
+       />
           <View style={styles.analysisContainer}>
             {Object.keys(moodIcons).map((estado) => (
               <View key={estado} style={styles.analysisBox}>
